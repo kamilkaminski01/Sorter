@@ -22,7 +22,7 @@ public class Sorter {
         if (!f.exists()) {
             PrintStream output = new PrintStream("test.txt");
 
-            System.out.println("Ten plik nie istnieje, utowrzylem plik test.txt");
+            System.out.println("Ten plik nie istnieje, utworzylem plik test.txt");
             Scanner scanner = new Scanner(System.in);
             System.out.print("Podaj ilosc liczb do wygenerowania: ");
             int amount = scanner.nextInt();
@@ -36,7 +36,6 @@ public class Sorter {
             scanner = new Scanner(f);
             int temp1 = 0;
             this.numOfLines = temp1;
-
             while (scanner.hasNextLine()) {
                 scanner.nextLine();
                 temp1++;
@@ -78,6 +77,7 @@ public class Sorter {
 
     }
 
+    //-----------------------------------------------------------------
     public void doBubbleSort(int arr[]) {
         przypisania = 0;
         porownania = 0;
@@ -89,8 +89,11 @@ public class Sorter {
                 porownania++;
                 if (arr[j] > arr[j + 1]) {
                     int temp = arr[j];
+                    przypisania++;
                     arr[j] = arr[j + 1];
+                    przypisania++;
                     arr[j + 1] = temp;
+                    przypisania++;
                 }
             }
         }
@@ -114,8 +117,11 @@ public class Sorter {
                 porownania++;
                 if (arr[j] > arr[j + 1]) {
                     temp = arr[j];
+                    przypisania++;
                     arr[j] = arr[j + 1];
+                    przypisania++;
                     arr[j + 1] = temp;
+                    przypisania++;
                     swapped = true;
                 }
             }
@@ -171,16 +177,132 @@ public class Sorter {
                 }
             }
             int temp = arr[min];
+            przypisania++;
             arr[min] = arr[i];
+            przypisania++;
             arr[i] = temp;
+            przypisania++;
         }
         long stop = System.nanoTime();
         long time = stop - start;
         czas = time;
     }
 
-    public void saveAs(String file) throws FileNotFoundException {
-        File f = new File(file);
+    public void doQuickSort(int arr[], int low, int high){
+        int i = low;
+        int j = high;
+
+        int pivot = arr[low + (high - low) / 2];
+        int exchange;
+
+        long start = System.nanoTime();
+        while (i <= j) {
+            porownania++;
+            while (arr[i] < pivot) {
+                porownania++;
+                i++;
+            }
+            while (arr[j] > pivot) {
+                j--;
+                porownania++;
+            }
+            porownania++;
+            if (i <= j) {
+                exchange = arr[i];
+                przypisania++;
+                arr[i] = arr[j];
+                przypisania++;
+                arr[j] = exchange;
+                przypisania++;
+                i++;
+                j--;
+            }
+        }
+        if (low < j)
+            doQuickSort(arr, low, j);
+        if (i < high)
+            doQuickSort(arr, i, high);
+        long stop = System.nanoTime();
+        long time = stop - start;
+        czas = time;
+    }
+
+    public void doMergeSort(int arr[], int l, int r){
+        long start = System.nanoTime();
+        if (l < r){
+            int m = l + (r-l)/2;
+
+            doMergeSort(arr, l, m);
+            doMergeSort(arr, m + 1, r);
+            merge(arr, l, m, r);
+
+        }
+        long stop = System.nanoTime();
+        long time = stop - start;
+        czas = time;
+    }
+
+    public void merge(int arr[], int l, int m, int r){
+        int n1 = m - l + 1;
+        int n2 = r - m;
+
+        int L[] = new int[n1];
+        int R[] = new int[n2];
+
+        for (int i = 0; i < n1; ++i){
+            L[i] = arr[l + i];
+            przypisania++;
+        }
+        for (int j = 0; j < n2; ++j){
+            R[j] = arr[m + 1 + j];
+            przypisania++;
+        }
+
+        int i = 0, j = 0;
+        int k = l;
+
+        while (i < n1 && j < n2){
+            porownania++;
+            if (L[i] <= R[j]){
+                arr[k] = L[i];
+                przypisania++;
+                i++;
+            }
+            else {
+                arr[k] = R[j];
+                przypisania++;
+                j++;
+            }
+            k++;
+        }
+
+        while (i < n1){
+            przypisania++;
+            arr[k] = L[i];
+            i++;
+            k++;
+        }
+
+        while (j < n2){
+            przypisania++;
+            arr[k] = R[j];
+            j++;
+            k++;
+        }
+    }
+
+    public void Swap(int[] arr, int i, int j){
+        int temp = arr[i];
+        przypisania++;
+        arr[i] = arr[j];
+        przypisania++;
+        arr[j] = temp;
+        przypisania++;
+    }
+    //-----------------------------------------------------------------
+
+    public void saveAs() throws FileNotFoundException {
+        File f = new File("test.txt");
         PrintStream output = new PrintStream(f);
 
         while (numOfLines != 0) {
@@ -189,7 +311,7 @@ public class Sorter {
                 numOfLines--;
             }
         }
-        System.out.println("Dane zapisane do pliku");
+        System.out.println("Dane zapisane do pliku test.txt");
     }
 
     public void setDebug(int n) {
@@ -219,6 +341,20 @@ public class Sorter {
             System.out.println("Liczba porownan: " + porownania);
             System.out.println("Liczba przypisan: " + przypisania);
         }
+        else if (n == 5){
+            System.out.println("\nNazwa algorytmu: QuickSort");
+            System.out.println("\nIlosc sortowanych liczb: " + numOfLines);
+            System.out.println("Czas dzialania: " + czas + " nanosekund");
+            System.out.println("Liczba porownan: " + porownania);
+            System.out.println("Liczba przypisan: " + przypisania);
+        }
+        else if (n == 6){
+            System.out.println("\nNazwa algorytmu: MergeSort");
+            System.out.println("\nIlosc sortowanych liczb: " + numOfLines);
+            System.out.println("Czas dzialania: " + czas + " nanosekund");
+            System.out.println("Liczba porownan: " + porownania);
+            System.out.println("Liczba przypisan: " + przypisania);
+        }
     }
 
     public static void main(String[] args) throws IOException {
@@ -232,6 +368,8 @@ public class Sorter {
         System.out.println("2 - Bubble Sort ze straznikiem");
         System.out.println("3 - Insert sort");
         System.out.println("4 - Select Sort");
+        System.out.println("5 - Quick Sort");
+        System.out.println("6 - Merge Sort");
         System.out.print("Wybierz metode sortowania: ");
         int choice = scanner.nextInt();
 
@@ -239,22 +377,36 @@ public class Sorter {
             sorter.doBubbleSort(sorter.numbers);
             sorter.setDebug(choice);
             System.out.println("\nDane posortowane");
-            sorter.saveAs(fileName);
+            sorter.saveAs();
         } else if (choice == 2) {
             sorter.doBubbleSortG(sorter.numbers);
             sorter.setDebug(choice);
             System.out.println("\nDane posortowane");
-            sorter.saveAs(fileName);
+            sorter.saveAs();
         } else if (choice == 3) {
             sorter.doInsertionSort(sorter.numbers);
             sorter.setDebug(choice);
             System.out.println("\nDane posortowane");
-            sorter.saveAs(fileName);
+            sorter.saveAs();
         } else if (choice == 4) {
             sorter.doSelectionSort(sorter.numbers);
             sorter.setDebug(choice);
             System.out.println("\nDane posortowane");
-            sorter.saveAs(fileName);
+            sorter.saveAs();
+        } else if (choice == 5){
+            sorter.przypisania = 0;
+            sorter.porownania = 0;
+            sorter.doQuickSort(sorter.numbers, 0, sorter.numbers.length - 1);
+            sorter.setDebug(choice);
+            System.out.println("\nDane posortowane");
+            sorter.saveAs();
+        } else if (choice == 6){
+            sorter.przypisania = 0;
+            sorter.porownania = 0;
+            sorter.doMergeSort(sorter.numbers, 0, sorter.numbers.length - 1);
+            sorter.setDebug(choice);
+            System.out.println("\nDane posortowane");
+            sorter.saveAs();
         } else {
             System.out.println("Podano zla wartosc");
         }
