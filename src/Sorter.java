@@ -14,6 +14,7 @@ public class Sorter {
     int przypisania;
     long czas;
 
+    // Konstruktor plikow
     public Sorter(String file) throws IOException {
         File f = new File(file);
         Random r = new Random();
@@ -22,9 +23,9 @@ public class Sorter {
         if (!f.exists()) {
             PrintStream output = new PrintStream("test.txt");
 
-            System.out.println("Ten plik nie istnieje, utworzylem plik test.txt");
+            System.out.println("Ten plik nie istnieje, utworzylem pusty plik test.txt");
             Scanner scanner = new Scanner(System.in);
-            System.out.print("Podaj ilosc liczb do wygenerowania: ");
+            System.out.print("Podaj ilosc liczb do wygenerowania do utworzonego pliku: ");
             int amount = scanner.nextInt();
 
             for (int i = 0; i < amount; i++) {
@@ -77,7 +78,65 @@ public class Sorter {
 
     }
 
+    // Zapis do pliku
+    public void saveAs() throws FileNotFoundException {
+        File f = new File("test.txt");
+        PrintStream output = new PrintStream(f);
+
+        while (numOfLines != 0) {
+            for (int number : numbers) {
+                output.println(number);
+                numOfLines--;
+            }
+        }
+        System.out.println("Dane zapisane do pliku test.txt");
+    }
+
+    // Diagnostyka wybranego sortowania
+    public void setDebug(int n) {
+        if (n == 1) {
+            System.out.println("\nNazwa algorytmu: BubbleSort");
+            setDebugInfo();
+        } else if (n == 2) {
+            System.out.println("\nNazwa algorytmu: BubbleSortG");
+            setDebugInfo();
+        } else if (n == 3) {
+            System.out.println("\nNazwa algorytmu: InsertionSort");
+            setDebugInfo();
+        } else if (n == 4) {
+            System.out.println("\nNazwa algorytmu: SelectionSort");
+            setDebugInfo();
+        }
+        else if (n == 5){
+            System.out.println("\nNazwa algorytmu: QuickSort");
+            setDebugInfo();
+        }
+        else if (n == 6){
+            System.out.println("\nNazwa algorytmu: MergeSort");
+            setDebugInfo();
+        }
+        else if (n == 7){
+            System.out.println("\nNazwa algorytmu: CountingSort");
+            System.out.println("Ilosc sortowanych liczb: " + numOfLines);
+            System.out.println("Czas dzialania: " + czas + " nanosekund");
+        }
+        else if (n == 8){
+            System.out.println("\nNazwa algorytmu: JavaSort");
+            System.out.println("Ilosc sortowanych liczb: " + numOfLines);
+            System.out.println("Czas dzialania: " + czas + " nanosekund");
+        }
+    }
+
+    public void setDebugInfo(){
+        System.out.println("Ilosc sortowanych liczb: " + numOfLines);
+        System.out.println("Czas dzialania: " + czas + " nanosekund");
+        System.out.println("Liczba porownan: " + porownania);
+        System.out.println("Liczba przypisan: " + przypisania);
+    }
+
+    // Sortowania
     //-----------------------------------------------------------------
+
     public void doBubbleSort(int arr[]) {
         przypisania = 0;
         porownania = 0;
@@ -291,71 +350,41 @@ public class Sorter {
         }
     }
 
-    public void Swap(int[] arr, int i, int j){
-        int temp = arr[i];
-        przypisania++;
-        arr[i] = arr[j];
-        przypisania++;
-        arr[j] = temp;
-        przypisania++;
+    public void doCountingSort(int arr[]){
+        int max = Arrays.stream(arr).max().getAsInt();
+        int min = Arrays.stream(arr).min().getAsInt();
+        int range = max - min + 1;
+        int count[] = new int[range];
+        int output[] = new int[arr.length];
+
+        long start = System.nanoTime();
+        for (int i = 0; i < arr.length; i++){
+            count[arr[i] - min]++;
+        }
+        for (int i = 1; i < count.length; i++) {
+            count[i] += count[i - 1];
+        }
+        for (int i = arr.length - 1; i >= 0; i--) {
+            output[count[arr[i] - min] - 1] = arr[i];
+            count[arr[i] - min]--;
+        }
+        for (int i = 0; i < arr.length; i++){
+            arr[i] = output[i];
+        }
+        long stop = System.nanoTime();
+        long time = stop - start;
+        czas = time;
     }
+
+    public void doJavaSort(int arr[]){
+        long start = System.nanoTime();
+        Arrays.sort(arr);
+        long stop = System.nanoTime();
+        long time = stop - start;
+        czas = time;
+    }
+
     //-----------------------------------------------------------------
-
-    public void saveAs() throws FileNotFoundException {
-        File f = new File("test.txt");
-        PrintStream output = new PrintStream(f);
-
-        while (numOfLines != 0) {
-            for (int number : numbers) {
-                output.println(number);
-                numOfLines--;
-            }
-        }
-        System.out.println("Dane zapisane do pliku test.txt");
-    }
-
-    public void setDebug(int n) {
-
-        if (n == 1) {
-            System.out.println("\nNazwa algorytmu: BubbleSort");
-            System.out.println("Ilosc sortowanych liczb: " + numOfLines);
-            System.out.println("Czas dzialania: " + czas + " nanosekund");
-            System.out.println("Liczba porownan: " + porownania);
-            System.out.println("Liczba przypisan: " + przypisania);
-        } else if (n == 2) {
-            System.out.println("\nNazwa algorytmu: BubbleSortG");
-            System.out.println("Ilosc sortowanych liczb: " + numOfLines);
-            System.out.println("Czas dzialania: " + czas + " nanosekund");
-            System.out.println("Liczba porownan: " + porownania);
-            System.out.println("Liczba przypisan: " + przypisania);
-        } else if (n == 3) {
-            System.out.println("\nNazwa algorytmu: InsertionSort");
-            System.out.println("Ilosc sortowanych liczb: " + numOfLines);
-            System.out.println("Czas dzialania: " + czas + " nanosekund");
-            System.out.println("Liczba porownan: " + porownania);
-            System.out.println("Liczba przypisan: " + przypisania);
-        } else if (n == 4) {
-            System.out.println("\nNazwa algorytmu: SelectionSort");
-            System.out.println("\nIlosc sortowanych liczb: " + numOfLines);
-            System.out.println("Czas dzialania: " + czas + " nanosekund");
-            System.out.println("Liczba porownan: " + porownania);
-            System.out.println("Liczba przypisan: " + przypisania);
-        }
-        else if (n == 5){
-            System.out.println("\nNazwa algorytmu: QuickSort");
-            System.out.println("\nIlosc sortowanych liczb: " + numOfLines);
-            System.out.println("Czas dzialania: " + czas + " nanosekund");
-            System.out.println("Liczba porownan: " + porownania);
-            System.out.println("Liczba przypisan: " + przypisania);
-        }
-        else if (n == 6){
-            System.out.println("\nNazwa algorytmu: MergeSort");
-            System.out.println("\nIlosc sortowanych liczb: " + numOfLines);
-            System.out.println("Czas dzialania: " + czas + " nanosekund");
-            System.out.println("Liczba porownan: " + porownania);
-            System.out.println("Liczba przypisan: " + przypisania);
-        }
-    }
 
     public static void main(String[] args) throws IOException {
         Scanner scanner = new Scanner(System.in);
@@ -370,6 +399,8 @@ public class Sorter {
         System.out.println("4 - Select Sort");
         System.out.println("5 - Quick Sort");
         System.out.println("6 - Merge Sort");
+        System.out.println("7 - Counting Sort");
+        System.out.println("8 - Java Sort");
         System.out.print("Wybierz metode sortowania: ");
         int choice = scanner.nextInt();
 
@@ -404,6 +435,16 @@ public class Sorter {
             sorter.przypisania = 0;
             sorter.porownania = 0;
             sorter.doMergeSort(sorter.numbers, 0, sorter.numbers.length - 1);
+            sorter.setDebug(choice);
+            System.out.println("\nDane posortowane");
+            sorter.saveAs();
+        } else if (choice == 7){
+            sorter.doCountingSort(sorter.numbers);
+            sorter.setDebug(choice);
+            System.out.println("\nDane posortowane");
+            sorter.saveAs();
+        } else if (choice == 8){
+            sorter.doJavaSort(sorter.numbers);
             sorter.setDebug(choice);
             System.out.println("\nDane posortowane");
             sorter.saveAs();
